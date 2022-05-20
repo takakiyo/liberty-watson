@@ -1,11 +1,11 @@
-FROM icr.io/appcafe/open-liberty:full-java11-openj9-ubi
+FROM docker.io/websphere-liberty:22.0.0.3-kernel-java11-openj9
 
 ARG VERSION=1.0
 ARG REVISION=SNAPSHOT
 
 LABEL \
   org.opencontainers.image.authors="Takakiyo" \
-  org.opencontainers.image.vendor="c" \
+  org.opencontainers.image.vendor="IBM Japan, Automation Software" \
   org.opencontainers.image.url="local" \
   org.opencontainers.image.source="https://github.com/takakiyo/liberty-watson" \
   org.opencontainers.image.version="$VERSION" \
