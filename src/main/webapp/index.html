@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Customer Care デモ</title>
+<style>
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+}
+.tabs label {
+  order: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 2rem;
+  margin-right: 0.2rem;
+  cursor: pointer;
+  background-color: pink;
+  font-weight: bold;
+  transition: background ease 0.3s;
+}
+.tabs .tab {
+  order: 9;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  display: none;
+  padding: 1rem;
+  background: #fff;
+  padding: 20px;
+  box-shadow: -10px 10px 0px 0px black;
+}
+.tabs input[type="radio"] {
+  display: none;
+}
+.tabs input[type="radio"]:checked + label {
+  background: #fff;
+}
+.tabs input[type="radio"]:checked + label + .tab {
+  display: block;
+}
+@media (max-width: 465px) {
+  .tabs .tab,
+  .tabs label {
+   order: initial;
+  }
+  .tabs label {
+    width: 100%;
+    margin-left: 50px;
+  }
+}
+html,body {
+  margin:0;
+  padding:0;
+  height:90%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+body {
+  font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  color: #333;
+  font-size: 15px;
+  }
+#left {
+  position:absolute;
+  top:20;
+  left:0px;
+  width:50%;
+  height:100%;
+  text-align:center;
+  }
+#right{
+  position:absolute;
+  top:20;
+  right:0;
+  left:50%;
+  height:100%;
+  border-left:2px solid #ccc;
+  }
+iframe {
+  border:none;
+  height:90%;
+  width:100%;
+  }
+</style>
+</head>
+<body>
+  <div class="tabs">
+  <input type="radio" name="tabs" id="tabone" checked="checked">
+  <label for="tabone">ピザの注文</label>
+    <div class="tab">
+      <div id="left">
+        <iframe src="pizza_cloud.jsp"></iframe>
+      </div>
+      <div id="right">
+        <iframe src="pizza_old_cloud.jsp"></iframe>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
