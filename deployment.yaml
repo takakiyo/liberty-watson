@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: liberty-watson
+  name: liberty-watson
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 600
+  selector:
+    matchLabels:
+      app: liberty-watson
+  template:
+    metadata:
+      labels:
+        app: liberty-watson
+    spec:
+      containers:
+      - name: app
+        image: <作成したイメージに変更>
+        imagePullPolicy: Always
+        securityContext:
+          runAsUser: 1001
+        ports:
+        - containerPort: 9080
+          name: http
+          protocol: TCP
+        env:
+        - name: TZ
+          value: Asia/Tokyo
+        - name: WLP_LOGGING_CONSOLE_LOGLEVEL
+          value: info
+        - name: WLP_LOGGING_CONSOLE_SOURCE
+          value: message,accessLog,ffdc,audit
+        - name: WLP_LOGGING_CONSOLE_FORMAT
+          value: json
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      serviceAccountName: liberty-watson
+      terminationGracePeriodSeconds: 30
