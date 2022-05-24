@@ -1,3 +1,11 @@
+
+# Stage 1. Build Java Application
+FROM docker.io/maven:3.8-openjdk-11 as build
+COPY . /tmp/src
+WORKDIR /tmp/src
+RUN mvn clean package
+
+# Stage 2. Build Liberty Custom Image
 FROM docker.io/websphere-liberty:22.0.0.3-kernel-java11-openj9
 
 ARG VERSION=1.0
@@ -23,7 +31,7 @@ LABEL \
 COPY --chown=1001:0 src/main/liberty/config /config/
 
 # tag::copy-war[]
-COPY --chown=1001:0 target/liberty-watson.war /config/apps
+COPY --chown=1001:0 --from=build /tmp/src/target/liberty-watson.war /config/apps
 # end::copy-war[]
 
 RUN configure.sh
