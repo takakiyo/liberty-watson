@@ -6,7 +6,7 @@ WORKDIR /tmp/src
 RUN mvn clean package
 
 # Stage 2. Build Liberty Custom Image
-FROM docker.io/ibmcom/websphere-liberty:22.0.0.3-kernel-java11-openj9-ubi
+FROM docker.io/ibmcom/websphere-liberty:22.0.0.3-full-java11-openj9-ubi
 
 ARG VERSION=1.0
 ARG REVISION=SNAPSHOT
