@@ -1,11 +1,11 @@
 # liberty-watson
 
 Technology Showcaseで実施するデモのサンプル・プロジェクトです。
-DevOpsの考え方を取り入れ，ローカルのテスト実行からクラウド上のコンテナへのデプロイまでの標準手順をしめしています。
+DevOpsの考え方を取り入れ，ローカルのテスト実行からクラウド上のOCP（OpenShift Continer Platform）へのデプロイまでの標準手順をしめしています。
 デモを実施するShowcaseのクラウド上に，この環境を常に置いておく必要はありません。
 必要なときにデプロイ作業をおこなえば，短時間で動作確認済みの環境が使えるようになります。
 
-いかのコマンドなどで「liberty-watson」とされている部分は，適宜，プロジェクトの名前に置き換えます。
+以下のコマンドなどで「liberty-watson」とされている部分は，適宜，プロジェクトの名前に置き換えます。
 
 ## ローカルでの実行
 
@@ -32,8 +32,9 @@ JDKならびにMavenが導入されている環境にcheckoutし，コマンド�
 podmanコマンドが使用できるようにセットアップされていることが前提です。
 
 Dockerfileがコンテナイメージを作成するためのソースファイルです。
-Mavenによるアプリケーションの作成もコンテナ上で実施するため，この手順は前章の「ローカルでの実行」をしていない状態でも実行可能です。
-このステップだけであれば，ローカルの環境にJDKやMavenが導入されていなくても実行できます。
+このDockerfileは，マルチステージビルドをおこなうようになっており，Mavenをつかってソースからアプリケーションを作成する作業もコンテナ上で実施するようになっています。
+つまりビルド専用のMavenのはいったコンテナを使用してアプリケーションのwarを作成し，それを実際に使用するLibertyのコンテナにコピーしています。
+そのため，このステップから実施する場合には，JDKやMavenは不要です。
 
 コマンドラインから以下のように実行すると，コンテナのイメージが作成されます。
 ここで指定している「1.0-SNAPSHOT」というタグのバージョンは，pom.xmlに定義されたバージョンをそのまま使用しています。
@@ -56,8 +57,113 @@ LibertyのコンテナイメージはDocker HubからPullされ，その上に�
 `http://localhost:9080/`にアクセスすることで，アプリケーションが正常に実行されているかを確認できます。
 サーバーを停止するには`podman ps`を実行してCONTAINER IDを調べ，`podman stop <CONTAINER ID>`，`podman rm <CONTAINER ID>`を実行します。
 
-## デモ環境のレポジトリにイメージをPullする
+独自のデモを作成する場合には，ローカルで実行可能なコンテナイメージを作成するDockerfileを開発し，同様にイメージをビルドしテスト実行できるようにします。
+
+## S2Iを使用してOCP環境にデプロイする
+
+コンテナイメージをOCP上にデプロイし，デモを実施できるようにします。
+ocコマンドが使用できるようにセットアップされていることが前提です。
+
+ブラウザでIBMクラウドにログインし，リソースリストのクラスター一覧から，デモをおこなうOpenShift環境を開きます。
+画面から，「OpenShift Webコンソール」を開きます。
+Webコンソールの右上，自分のアカウント名をクリックしたプルダウンメニューから「Copy Login Command」を開きます。
+「oc login --token=〜」から始まるコマンドをコピーし，コマンドプロンプトから入力してocコマンドを使用できるようにします。
+
+デモを実行するProjectを作成します。
+
+```
+% oc new-project liberty-watson
+```
+
+もしくは，既存のプロジェクトを使用する場合は，そのProjectを選択します。
+
+```
+% oc project liberty-watson
+```
+
+このプロジェクトのように，GitHub上にソースコードが公開されている場合は，そのURLを指定してS2Iでアプリケーションを作成します。
+
+```
+oc new-app https://github.com/takakiyo/liberty-watson --strategy=docker
+```
+
+カレントディレクトリにソースコードが展開されている場合は，以下のようにしてアプリケーションを作成します。
+
+```
+oc new-app . --strategy=docker
+```
+
+これにより，OCP上にimagestreamtag，buildconfig，deployment，serviceが作成されます。
+
+new-appを実行した直後にPodの一覧を表示すると，コンテナイメージをビルドするためのPodが立ち上がっていることが確認できます。
 
 
+```
+% oc get pod
+NAME                                      READY   STATUS    RESTARTS   AGE
+liberty-watson-1-build                    1/1     Running   0          63s
+```
 
-## デモ環境にデプロイする
+このPodのログを表示して，ビルドが正常に実行するかを確認します。
+ビルドが完了すると，コマンドプロンプトに復帰します。
+
+```
+% oc logs liberty-watson-1-build -f
+```
+
+Podが正しくデプロイされ，起動されている（AVAILABLEが0ではない）ことを確認します。
+
+```
+% oc get deploy
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+liberty-watson           1/1     1            1           6m26s
+```
+
+サービスを確認し，ClusterIPで公開されていることを確認します。
+
+```
+oc get svc
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+liberty-watson   ClusterIP   172.21.55.189   <none>        9080/TCP,9443/TCP   7m50s
+```
+
+サービスを外部からアセスできるようにExposeします。
+
+```
+% oc expose svc liberty-watson
+route.route.openshift.io/liberty-watson exposed
+```
+
+作成されたRouteを確認します。
+
+```
+% oc get route
+NAME             HOST/PORT                                                                                                                         PATH   SERVICES         PORT       TERMINATION   WILDCARD
+liberty-watson   liberty-watson-liberty-watson.xxxx-xxxxxxxxxxxx-tokyo-1-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-0000.jp-tok.containers.appdomain.cloud          liberty-watson   9080-tcp                 None
+```
+
+HOSTに表示されたURLにブラウザでアクセスすると，作成したアプリケーションを利用することができます。
+このとき，サーバーにhttpsではなく，httpでアクセスしないとつながりません。
+最近のブラウザは，プロトコルを指定せずにサーバー名を指定した場合，デフォルトでhttpsで接続しに行くため注意が必要です。
+
+## デモ実施後の環境の消去
+
+Route，Service，Deployment，BuildConfig，ImageStreamTagの順に削除していきます。
+
+```
+% oc delete route liberty-watson
+% oc delete svc liberty-watson
+% oc delete deploy liberty-watson
+% oc delete buildconfig liberty-watson
+% oc delete imagestreamtag liberty-watson:latest
+```
+
+# 独自のデモを作成する場合
+
+デモを実施するDockerファイルを開発してください。
+
+上にも記載されていますが，実際に使用するコンテナイメージの作成はS2Iを使用してOCP上で実行されるため，ビルドに外部のツールを使用しないようにすることが必要です。
+イメージの作成に外部ツールが必要な場合は，そのツールを含んだビルド用のイメージを使用する，マルチステージビルドのDockerfileを作成してください。
+
+Dockerfileで指定するベースイメージは，可能な限りUBI（Red Hat Universal Base Image）を使用したものにしてください。
+Ubuntuベースなどのイメージを使用した場合は，デプロイ時に権限の設定に失敗するなど，正常に利用できない可能性があります。
