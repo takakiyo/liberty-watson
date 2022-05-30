@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: <作成したイメージに変更>
+        image:  image-registry.openshift-image-registry.svc:5000/liberty-watson/liberty-watson@sha256:72b98e980246d4424992cbf4f0e60c95cd8cc49141a2da3b314c70d541f54693
         imagePullPolicy: Always
         securityContext:
           runAsUser: 1001
