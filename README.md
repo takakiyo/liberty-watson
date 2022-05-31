@@ -13,7 +13,7 @@ DevOpsの考え方を取り入れ，ローカルのテスト実行からクラ�
 クラウド上のWatsonサービスに接続し，ピザの注文を行うサイトのデモをおこなうことができます。
 
 アプリケーションならびにWebSphere Libertyの実行環境は，Mavenのプロジェクトとして定義されています。
-pom.xmlならびにsrcディレクトリ以下がその実態です。
+pom.xmlならびにsrcディレクトリ以下がその実体です。
 
 JDKならびにMavenが導入されている環境にcheckoutし，コマンドラインから以下のように実行すると，ローカルのPC上でアプリケーションをテスト実行することができます。
 
@@ -64,7 +64,7 @@ LibertyのコンテナイメージはDocker HubからPullされ，その上に�
 コンテナイメージをOCP上にデプロイし，デモを実施できるようにします。
 ocコマンドが使用できるようにセットアップされていることが前提です。
 
-ブラウザでIBMクラウドにログインし，リソースリストのクラスター一覧から，デモをおこなうOpenShift環境を開きます。
+ブラウザで[IBMクラウド](https://cloud.ibm.com/)にログインし，リソースリストのクラスター一覧から，デモをおこなうOpenShift環境を開きます。
 画面から，「OpenShift Webコンソール」を開きます。
 Webコンソールの右上，自分のアカウント名をクリックしたプルダウンメニューから「Copy Login Command」を開きます。
 「oc login --token=〜」から始まるコマンドをコピーし，コマンドプロンプトから入力してocコマンドを使用できるようにします。
@@ -84,16 +84,16 @@ Webコンソールの右上，自分のアカウント名をクリックした�
 このプロジェクトのように，GitHub上にソースコードが公開されている場合は，そのURLを指定してS2Iでアプリケーションを作成します。
 
 ```
-oc new-app https://github.com/takakiyo/liberty-watson --strategy=docker
+% oc new-app https://github.com/takakiyo/liberty-watson --strategy=docker
 ```
 
 カレントディレクトリにソースコードが展開されている場合は，以下のようにしてアプリケーションを作成します。
 
 ```
-oc new-app . --strategy=docker
+% oc new-app . --strategy=docker
 ```
 
-これにより，OCP上にimagestreamtag，buildconfig，deployment，serviceが作成されます。
+これにより，OCP上にImageStreamTag，BuildConfig，Deployment，Serviceが作成されます。
 
 new-appを実行した直後にPodの一覧を表示すると，コンテナイメージをビルドするためのPodが立ち上がっていることが確認できます。
 
@@ -122,7 +122,7 @@ liberty-watson           1/1     1            1           6m26s
 サービスを確認し，ClusterIPで公開されていることを確認します。
 
 ```
-oc get svc
+% oc get svc
 NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
 liberty-watson   ClusterIP   172.21.55.189   <none>        9080/TCP,9443/TCP   7m50s
 ```
@@ -160,7 +160,7 @@ Route，Service，Deployment，BuildConfig，ImageStreamTagの順に削除して
 
 # 独自のデモを作成する場合
 
-デモを実施するDockerファイルを開発してください。
+デモを実施するDockerfileを開発してください。
 
 上にも記載されていますが，実際に使用するコンテナイメージの作成はS2Iを使用してOCP上で実行されるため，ビルドに外部のツールを使用しないようにすることが必要です。
 イメージの作成に外部ツールが必要な場合は，そのツールを含んだビルド用のイメージを使用する，マルチステージビルドのDockerfileを作成してください。
