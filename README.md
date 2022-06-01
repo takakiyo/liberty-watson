@@ -15,13 +15,13 @@ DevOpsの考え方を取り入れ，ローカルのテスト実行からクラ�
 アプリケーションならびにWebSphere Libertyの実行環境は，Mavenのプロジェクトとして定義されています。
 pom.xmlならびにsrcディレクトリ以下がその実体です。
 
-JDKならびにMavenが導入されている環境にcheckoutし，コマンドラインから以下のように実行すると，ローカルのPC上でアプリケーションをテスト実行することができます。
+[JDK](https://developer.ibm.com/languages/java/semeru-runtimes/downloads/)ならびに[Mavenが導入](https://www.google.com/search?q=Maven+%E5%B0%8E%E5%85%A5)されている環境にcheckoutし，コマンドラインから以下のように実行すると，ローカルのPC上でアプリケーションをテスト実行することができます。
 
 ```
 % mvn liberty:run
 ```
 
-必要なLibertyの導入イメージなども，全てMavenのセントラルレポジトリから自動的にダウンロードされます。
+必要なLibertyの導入イメージなども，全て[Mavenのセントラルレポジトリから自動的にダウンロード](https://search.maven.org/search?q=com.ibm.websphere.appserver.runtime)されます。
 
 `http://localhost:9080/`にアクセスすることで，アプリケーションが正常に実行されているかを確認できます。
 サーバーを停止するにはCtrl＋Cをキーボードから入力します。
@@ -29,7 +29,7 @@ JDKならびにMavenが導入されている環境にcheckoutし，コマンド�
 ## コンテナイメージの作成とテスト
 
 コンテナイメージを作成し，手元のコンテナ環境で実行をテストします。
-podmanコマンドが使用できるようにセットアップされていることが前提です。
+[podmanコマンド](https://www.google.com/search?q=podman+%E5%B0%8E%E5%85%A5)が使用できるようにセットアップされていることが前提です。
 
 Dockerfileがコンテナイメージを作成するためのソースファイルです。
 このDockerfileは，マルチステージビルドをおこなうようになっており，Mavenをつかってソースからアプリケーションを作成する作業もコンテナ上で実施するようになっています。
@@ -62,7 +62,7 @@ LibertyのコンテナイメージはDocker HubからPullされ，その上に�
 ## S2Iを使用してOCP環境にデプロイする
 
 コンテナイメージをOCP上にデプロイし，デモを実施できるようにします。
-ocコマンドが使用できるようにセットアップされていることが前提です。
+[ocコマンド](https://cloud.ibm.com/docs/openshift?topic=openshift-openshift-cli&locale=ja)が使用できるようにセットアップされていることが前提です。
 
 ブラウザで[IBMクラウド](https://cloud.ibm.com/)にログインし，リソースリストのクラスター一覧から，デモをおこなうOpenShift環境を開きます。
 画面から，「OpenShift Webコンソール」を開きます。
